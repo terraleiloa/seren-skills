@@ -1,13 +1,15 @@
 ---
-name: Polymarket Bot
-description: Autonomous trading agent for Polymarket prediction markets using Seren ecosystem
-author: Seren AI
-version: 1.0.0
-tags: [trading, polymarket, prediction-markets, ai, autonomous, seren]
-kind: agent
-runtime: python
-publishers: [polymarket, seren-models]
-cost_estimate: "$1-5 per trading cycle"
+name: trader
+description: "Autonomous trading agent for Polymarket prediction markets using Seren ecosystem"
+metadata:
+  display-name: "Polymarket Trader"
+  author: "SerenAI"
+  version: "1.0.0"
+  tags: "trading,polymarket,prediction-markets,ai,autonomous,seren"
+  kind: "agent"
+  runtime: "python"
+  publishers: "polymarket,seren-models"
+  cost_estimate: "$1-5 per trading cycle"
 ---
 
 # Polymarket Trading Bot

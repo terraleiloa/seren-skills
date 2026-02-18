@@ -1,13 +1,15 @@
 ---
-name: Coinbase Grid Trader
+name: grid-trader
 description: "Automated grid trading bot for Coinbase Exchange — profits from price oscillation using a mechanical, non-directional strategy"
-kind: agent
-runtime: python
-author: Seren AI
-version: 1.0.0
-tags: [trading, crypto, coinbase, grid-bot]
-publishers: [coinbase, seren-models]
-cost_estimate: "$0.50-2.00 per trading cycle"
+metadata:
+  display-name: "Coinbase Grid Trader"
+  kind: "agent"
+  runtime: "python"
+  author: "SerenAI"
+  version: "1.0.0"
+  tags: "trading,crypto,coinbase,grid-bot"
+  publishers: "coinbase,seren-models"
+  cost_estimate: "$0.50-2.00 per trading cycle"
 ---
 
 # Coinbase Grid Trader
