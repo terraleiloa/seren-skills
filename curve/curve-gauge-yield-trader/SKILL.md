@@ -35,6 +35,15 @@ description: "Multi-chain Curve gauge yield trading skill with paper-first defau
   - `wallet_mode=local`: agent signs with local private key.
   - `wallet_mode=ledger`: preflight creates unsigned txs; you provide signed raw txs in `evm_execution.ledger.signed_raw_transactions` for broadcast.
 
+## Disclaimer
+
+This skill can trade real money. Use at your own risk. Past performance does not guarantee future results.
+
+- DeFi carries smart-contract, oracle, liquidity, and slippage risks.
+- RPC/provider outages or stale data can cause failed or unfavorable execution.
+- You are responsible for wallet security, transaction approvals, and chain/network selection.
+- Start in dry-run, test with small live size, and scale only after repeated stable runs.
+
 ## Wallet Modes
 
 - `wallet_mode=local`: generate a local wallet with `--init-wallet`, then fund that address.
