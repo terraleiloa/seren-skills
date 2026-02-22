@@ -1,7 +1,6 @@
 {
   "connectors": [
     "curve_api",
-    "evm_exec",
     "rpc_arbitrum",
     "rpc_avalanche",
     "rpc_base",
@@ -30,20 +29,24 @@
     "ledger_address": ""
   },
   "position_sync": {
-    "enabled": true,
-    "path": "/positions/update"
+    "enabled": true
   },
   "rpc_capability": {
     "required": true,
     "probes": [
       {
-        "method": "GET",
-        "path": "/health",
-        "body": {}
+        "method": "POST",
+        "path": "",
+        "body": {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "eth_chainId",
+          "params": []
+        }
       },
       {
         "method": "POST",
-        "path": "/",
+        "path": "/ext/bc/C/rpc",
         "body": {
           "jsonrpc": "2.0",
           "id": 1,
@@ -60,10 +63,40 @@
           "method": "eth_chainId",
           "params": []
         }
+      },
+      {
+        "method": "GET",
+        "path": "/health",
+        "body": {}
       }
     ]
   },
   "rpc_publishers": {},
+  "evm_execution": {
+    "strategy": "gauge_stake_lp",
+    "tx": {
+      "gas_price_multiplier": 1.1,
+      "gas_limit_multiplier": 1.2,
+      "fallback_gas_limit": 350000
+    },
+    "gauge_stake_lp": {
+      "gauge_address": "",
+      "lp_token_address": "",
+      "lp_amount_wei": "",
+      "lp_token_decimals": 18,
+      "approve_first": true,
+      "approve_max": true
+    },
+    "custom_tx": {
+      "to": "",
+      "data": "0x",
+      "value_wei": 0,
+      "label": "custom_transaction"
+    },
+    "ledger": {
+      "signed_raw_transactions": []
+    }
+  },
   "cron": {
     "enabled": false,
     "job_name": "curve-gauge-yield-trader",
@@ -72,7 +105,7 @@
   },
   "warnings": [
     "Dry-run is the default mode. No live transactions are sent unless live_mode=true and --yes-live is set.",
-    "Live mode uses real funds. Fund wallet carefully and keep position limits conservative."
+    "Live mode signs and broadcasts on your local machine. Keep private keys local and secure."
   ],
   "skill": "curve-gauge-yield-trader"
 }

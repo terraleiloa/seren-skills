@@ -49,9 +49,6 @@ connectors:
   curve_api:
     kind: seren_publisher
     publisher: curve-finance
-  evm_exec:
-    kind: seren_publisher
-    publisher: evm-exec
   seren_cron:
     kind: seren_publisher
     publisher: seren-cron
@@ -100,13 +97,13 @@ workflow:
     - id: fetch_top_gauges
       use: connector.curve_api.get
       with:
-        path: /gauges/highest-rewards
-        chain: "{chain}"
-        limit: "{top_n_gauges}"
+        path: /getGauges
     - id: choose_trade
       use: transform.select_best_gauge
       with:
         from_step: fetch_top_gauges
+        chain: "{chain}"
+        limit: "{top_n_gauges}"
         token: "{deposit_token}"
         amount_usd: "{deposit_amount_usd}"
     - id: signer_setup
@@ -114,10 +111,18 @@ workflow:
       with:
         wallet_mode: "{wallet_mode}"
         chain: "{chain}"
-    - id: preflight
-      use: connector.evm_exec.post
+    - id: rpc_discovery
+      use: connector.catalog.find_rpc_for_chain
       with:
-        path: /preflight/liquidity
+        chain: "{chain}"
+    - id: rpc_capability_preflight
+      use: connector.rpc_probe.post
+      with:
+        from_step: rpc_discovery
+    - id: preflight
+      use: transform.local_evm_preflight
+      with:
+        rpc_from: rpc_capability_preflight
         body_from: choose_trade
     - id: live_guard
       use: transform.guard_live_execution
@@ -126,10 +131,9 @@ workflow:
         live_mode: "{live_mode}"
         warning: Live execution uses real funds. Keep dry-run until wallet funding and signer checks are complete.
     - id: execute_liquidity_trade
-      use: connector.evm_exec.post
+      use: transform.local_sign_and_broadcast
       with:
-        path: /trade/liquidity
-        body_from: live_guard
+        from_step: live_guard
 tests:
   quick:
     - validates_chain_and_signer_inputs

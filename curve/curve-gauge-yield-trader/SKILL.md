@@ -13,12 +13,13 @@ description: "Multi-chain Curve gauge yield trading skill with paper-first defau
 
 ## Workflow Summary
 
-1. `fetch_top_gauges` uses `connector.curve_api.get`
+1. `fetch_top_gauges` uses `connector.curve_api.get` (`/getGauges`)
 2. `choose_trade` uses `transform.select_best_gauge`
 3. `signer_setup` uses `transform.setup_signer`
-4. `preflight` uses `connector.evm_exec.post`
-5. `live_guard` uses `transform.guard_live_execution`
-6. `execute_liquidity_trade` uses `connector.evm_exec.post`
+4. `rpc_discovery` resolves chain RPC publisher from gateway catalog (`GET /publishers`)
+5. `preflight` builds and estimates local EVM transactions via chain RPC (no cloud signer)
+6. `live_guard` uses `transform.guard_live_execution`
+7. `execute_liquidity_trade` signs locally and submits with `eth_sendRawTransaction`
 
 ## Funding and Safety
 
@@ -30,11 +31,28 @@ description: "Multi-chain Curve gauge yield trading skill with paper-first defau
 - Each run resolves the RPC publisher from the live Seren publisher catalog (`GET /publishers`) and performs an explicit probe before preflight/trade.
   - If probe fails, execution stops early with a clear unsupported-chain/RPC error.
 - Optional override: set `rpc_publishers` in config (`{ "ethereum": "<slug>" }`) to force a specific publisher slug per chain.
+- Transactions are prepared and signed locally.
+  - `wallet_mode=local`: agent signs with local private key.
+  - `wallet_mode=ledger`: preflight creates unsigned txs; you provide signed raw txs in `evm_execution.ledger.signed_raw_transactions` for broadcast.
 
 ## Wallet Modes
 
-- `wallet_mode=local`: generate a local wallet with `--init-wallet` and fund it.
-- `wallet_mode=ledger`: provide a Ledger EVM address and sign through your hardware wallet flow.
+- `wallet_mode=local`: generate a local wallet with `--init-wallet`, then fund that address.
+- `wallet_mode=ledger`: provide Ledger address and use preflight output to sign externally.
+
+## Local Execution Config
+
+- Default strategy is `evm_execution.strategy = "gauge_stake_lp"`.
+  - Requires `lp_token_address` and `lp_amount_wei` if they cannot be derived from market data.
+  - Optional `gauge_address` override.
+- For fully custom calls, use `evm_execution.strategy = "custom_tx"` and set:
+  - `evm_execution.custom_tx.to`
+  - `evm_execution.custom_tx.data`
+  - `evm_execution.custom_tx.value_wei`
+- Gas behavior is controlled with:
+  - `evm_execution.tx.gas_price_multiplier`
+  - `evm_execution.tx.gas_limit_multiplier`
+  - `evm_execution.tx.fallback_gas_limit`
 
 ## Quick Start
 
@@ -65,5 +83,5 @@ description: "Multi-chain Curve gauge yield trading skill with paper-first defau
 Each scheduled run executes one full cycle:
 - sync positions
 - fetch top gauges
-- preflight
+- build local preflight txs
 - execute if live mode is enabled and `--yes-live` is set on the server process
