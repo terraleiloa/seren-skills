@@ -1,0 +1,43 @@
+# Grant Intake — Extended docs
+
+This skill backs the **grant-intake** Seren Cloud agent: a five-phase state machine that collects org info, sectors, logic models, and sector metrics, then exports a Grant Readiness Summary and intake state JSON.
+
+## API contract
+
+- **Request:** `POST` with JSON body `{ "state": <object or null>, "input": { ... } }`.
+- **Response:** `{ "state", "prompt", "outputs?" }`. Use `state` on the next request to continue; when phase 5 is confirmed, `outputs` includes `grant-readiness-summary.md` and `intake-state.json`.
+
+## Phase 1 input
+
+- `org_name` (string)
+- `mission` (string)
+- `key_programs` (array of strings)
+- Optional: `docs_analyzed` (array of strings)
+
+## Phase 2 input
+
+- `sectors` (array of sector ids, e.g. `["workforce","health"]`)
+- Optional: `custom_sector` — `{ "name": "...", "questions": [{ "id", "text", "hint" }] }`
+
+## Phase 3 input
+
+- `logic_model` — `{ "inputs", "activities", "outputs", "outcomes" }` for the current program
+- Or `new_programs` (array of names) if no programs were set in phase 1
+
+## Phase 4 input
+
+- `question_id` (string), `answer` (string)
+- Optional: `want_hint` (boolean) for hint text
+
+## Phase 5 input
+
+- `confirmed` (boolean)
+- Optional: `edits` (string) if not confirming
+
+## Deploy and invoke
+
+- **Agent ID (current):** `bc2491df-5ca0-466e-8acb-3dafd1b32bec`
+- **Invoke URL:** `https://api.serendb.com/publishers/seren-cloud/agents/bc2491df-5ca0-466e-8acb-3dafd1b32bec/runs`
+- **Auth:** `Authorization: Bearer $SEREN_API_KEY`
+
+See [docs/seren/README.md](https://github.com/serendb/seren-sql-interface-402mcp-server/blob/main/docs/seren/README.md) in the source repo for full control-plane and deploy steps.
