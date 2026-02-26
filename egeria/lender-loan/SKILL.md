@@ -1,12 +1,12 @@
 ---
-name: ovadiya-loan
-description: "Qualify groups for non-recourse stock/crypto loans and institutional block trades based on Ovadiya criteria. Maintains provider anonymity during qualification. Notifies Erik @ Volume Finance upon qualification."
+name: lender-loan
+description: "Qualify groups for non-recourse stock/crypto loans and institutional block trades based on lender criteria. Maintains provider anonymity during qualification. Notifies Erik @ Volume Finance upon qualification."
 license: Apache-2.0
 ---
 
-# Ovadiya Loan Qualification
+# Lender Loan Qualification
 
-This skill qualifies potential borrowers for non-recourse loans against publicly listed equities or crypto assets, or for institutional block trades, without revealing the lending partner (Ovadiya).
+This skill qualifies potential borrowers for non-recourse loans against publicly listed equities or crypto assets, or for institutional block trades, without revealing the lending partner.
 
 ## When to Use
 
@@ -16,7 +16,7 @@ This skill qualifies potential borrowers for non-recourse loans against publicly
 
 ## Qualification Criteria (Internal)
 
-**Do NOT reveal these specifics as "Ovadiya's criteria" to the user, but use them to qualify.**
+**Do NOT reveal these specifics as "the lender's criteria" to the user, but use them to qualify.**
 
 1.  **Equity-Backed Financing:**
     -   Asset: Publicly listed equities (major exchanges).
@@ -75,5 +75,22 @@ A new group has qualified for the loan program.
 
 ## Notes
 
-- **Anonymity:** Refer to the provider as "our institutional partner" or "the lending facility", never "Ovadiya".
-- **Source:** https://ovadiya.net/ (Do not share this link with the user).
+- **Anonymity:** Refer to the provider as "our institutional partner" or "the lending facility".
+- **Source:** (Confidential lender website, do not share).
+
+---
+
+## Using the skill on Seren Desktop
+
+The **lender-loan** skill is deployed as a Seren Cloud agent. From [Seren Desktop](https://github.com/serenorg/seren-desktop):
+
+- **Agent ID:** `04244f5a-1133-4cd7-87cd-4ce80f62636f`
+- **Run URL:** `https://api.serendb.com/publishers/seren-cloud/agents/04244f5a-1133-4cd7-87cd-4ce80f62636f/runs`
+
+1. **Sign in** and ensure Seren/Gateway MCP is enabled so the AI can call **list_cloud_agents** and **run_cloud_agent**.
+2. **Run the agent** by name: e.g. *"Run the lender-loan agent"* or *"List my cloud agents and run lender-loan."*
+3. **Request/response format** for runs:
+   - **POST** body: `{ "state": <current state or null>, "input": { "asset_type"?, "asset_symbol"?, "asset_value"?, "loan_amount"? } }`
+   - **Response:** `{ "state", "prompt", "outputs?" }` — use the returned `state` for the next run to advance through phases (asset info → evaluation → notification).
+4. **Example first run:** `{ "state": null, "input": { "asset_type": "equity", "asset_value": "1000000", "loan_amount": "600000" } }`
+5. If you don’t see cloud agents, confirm your account is in the same organization as the deployment and that MCP is enabled; see [Seren Desktop docs](https://github.com/serenorg/seren-desktop) and [Seren Cloud skill](https://api.serendb.com/publishers/seren-cloud/skill.md).
